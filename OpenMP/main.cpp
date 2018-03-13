@@ -9,7 +9,7 @@ double step;
 int main(int argc, char* argv[])
 {
 	clock_t start, stop;
-	volatile double x;
+	volatile double x; //kompilator nie zaklada ze zmienna moze sie zmieniac poza obszarem gdzie wytepuje
 	double pi, sum = 0.0;
 	int i;
 	step = 1. / (double)num_steps;
@@ -17,19 +17,18 @@ int main(int argc, char* argv[])
 
 #pragma omp parallel // i is private for thread
 	{
-		//region
-		double suml = 0;
+		//double suml = 0;
 #pragma omp for reduction(+:sum)
+		//powstaja kopie zm. sum
 		for (i = 0; i < num_steps; i++)
 		{
-			double x = (i + .5)*step; // x must be private (add double)
-            //#pragma omp atomic //Niepodzielnoosc uaktualnienia
-			//sum += 4.0 / (1. + x*x);
-
-			suml += 4.0 / (1. + x*x);
+			double x = (i + .5)*step;
+			//lokalny sum
+			sum += 4.0 / (1. + x*x);
 		}
 #pragma omp atomic
-		sum += suml;
+		//scalenie
+        //globalna sum
 	}
 
 	pi = sum*step;
