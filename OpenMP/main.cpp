@@ -10,25 +10,28 @@ int main(int argc, char* argv[])
 {
 	clock_t start, stop;
 	volatile double x; //kompilator nie zaklada ze zmienna moze sie zmieniac poza obszarem gdzie wytepuje
-	double pi, sum = 0.0;
+	double pi, sum = 0.0, tablica[100];
 	int i;
 	step = 1. / (double)num_steps;
 	start = clock();
+	
+	for (int j = 0; j < 100; j++)
+        tablica[j] = 0;
 
 #pragma omp parallel // i is private for thread
 	{
-		//double suml = 0;
-#pragma omp for reduction(+:sum)
+		int id = omp_get_thread_num();	//raz wywolana
+#pragma omp for
 		//powstaja kopie zm. sum
 		for (i = 0; i < num_steps; i++)
 		{
 			double x = (i + .5)*step;
 			//lokalny sum
-			sum += 4.0 / (1. + x*x);
+			tablica[id] += 4.0 / (1. +x*x);
 		}
 #pragma omp atomic
-		//scalenie
-        //globalna sum
+		
+		sum += tablica[id];	//tablica -> zamek -> odczyt z pamieci -> zmienic wartosz -> zmiana wartosci -> zciagam blokade	
 	}
 
 	pi = sum*step;
