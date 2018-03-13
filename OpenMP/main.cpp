@@ -9,22 +9,21 @@ double step;
 int main(int argc, char* argv[])
 {
 	clock_t start, stop;
-	double x, pi, sum = 0.0;
+	volatile double x;
+	double pi, sum = 0.0;
 	int i;
 	step = 1. / (double)num_steps;
 	start = clock();
 
-#pragma omp parallel //for // then i is private for thread
+#pragma omp parallel // i is private for thread
 	{
 		//region
 		double suml = 0;
-#pragma omp for
+#pragma omp for reduction(+:sum)
 		for (i = 0; i < num_steps; i++)
 		{
 			double x = (i + .5)*step; // x must be private (add double)
-
-
-			//#pragma omp atomic //Niepodzielnoosc uaktualnienia
+            //#pragma omp atomic //Niepodzielnoosc uaktualnienia
 			//sum += 4.0 / (1. + x*x);
 
 			suml += 4.0 / (1. + x*x);
