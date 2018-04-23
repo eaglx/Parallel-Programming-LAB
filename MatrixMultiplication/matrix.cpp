@@ -30,16 +30,7 @@ void initialize_matrices()
     }
 }
 
-void initialize_matricesZ()
-{
-    // zdefiniowanie zawarosci poczatkowej macierzy
-#pragma omp parallel for 
-    for (int i = 0 ; i < ROWS ; i++) {
-            for (int j = 0 ; j < COLUMNS ; j++) {
-                   matrix_r[i][j] = 0.0 ;
-            }
-    }
-}
+
 void print_result()
 {
     // wydruk wyniku
@@ -77,44 +68,20 @@ void multiply_matrices_IKJ()
                       
 }
 
-//*****FROM****SOURCE********
-void multiply_matrices_ijk()
+void multiply_matrices_IJK_IKJ()
 {
-#pragma omp parallel for
-    for (int i = 0; i < ROWS; i++)
-    {
-        for (int j = 0; j < COLUMNS; j++)
-        {
-            float sum = 0.0;
-            for (int k = 0; k < COLUMNS; k++)
-            {
-                sum += matrix_a[i][k] * matrix_b[k][j];
-            }
-            matrix_r[i][j] = sum;
-        }
-    }
-}
- 
-void multiply_matrices_ijk_ikj()
-{
-#pragma omp parallel for
     for (int i = 0; i < ROWS; i += R)
         for (int j = 0; j < COLUMNS; j += R)
             for (int k = 0; k < COLUMNS; k += R)
+            {
+                #pragma omp parallel for
                 for (int ii = i; ii < i + R; ii++)
                     for (int kk = k; kk < k + R; kk++)
                         for (int jj = j; jj < j + R; jj++)
                             matrix_r[ii][jj] += matrix_a[ii][kk] * matrix_b[kk][jj];
+            }
 }
- 
-void multiply_matrices_ikj()
-{
-    for (int i = 0; i < ROWS; i++)
-        for (int k = 0; k < COLUMNS; k++)
-            for (int j = 0; j < COLUMNS; j++)
-                matrix_r[i][j] += matrix_a[i][k] * matrix_b[k][j];
-}
-//***END****FROM*****SOURCE*****
+
 
 void print_elapsed_time()
 {
@@ -155,25 +122,22 @@ int main(int argc, char* argv[])
     fprintf(result_file, "Klasyczny algorytm mnozenia macierzy, liczba watkow %d \n",NumThreads) ;
 	printf("liczba watkow  = %d\n\n", NumThreads);
 	
-    initialize_matrices() ;
-    start = (double) clock() / CLK_TCK ;
-    multiply_matrices_IJK() ;
-    printf( "IJK ");
-    print_elapsed_time() ;
-    initialize_matricesZ() ;
-    start = (double) clock() / CLK_TCK ;
-    multiply_matrices_IKJ() ;
+    initialize_matrices();
     printf( "IKJ ");
-    print_elapsed_time() ;
-    initialize_matricesZ() ;
     start = (double) clock() / CLK_TCK ;
-    multiply_matrices_JIK() ;
-    printf( "JIK ");
+    multiply_matrices_IKJ();
     print_elapsed_time() ;
-    initialize_matricesZ() ;
+
+    initialize_matrices();
+    printf( "IJK ");
     start = (double) clock() / CLK_TCK ;
-    multiply_matrices_JKI() ;
-    printf( "JKI ");
+    multiply_matrices_IJK();
+    print_elapsed_time() ;
+
+    initialize_matrices();
+    printf( "IJK_IKJ ");
+    start = (double) clock() / CLK_TCK ;
+    multiply_matrices_IJK_IKJ()
     print_elapsed_time() ;
 
     fclose(result_file) ;
