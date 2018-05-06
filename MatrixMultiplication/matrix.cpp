@@ -46,6 +46,17 @@ void print_result()
 }
 
 
+void multiply_matrices_IKJ_SEQ()
+{
+	// mnozenie macierzy 
+	for (int i = 0; i < ROWS; i++)
+	for (int k = 0; k < COLUMNS; k++)
+	for (int j = 0; j < COLUMNS; j++)
+		matrix_r[i][j] += matrix_a[i][k] * matrix_b[k][j];
+
+}
+
+
 void multiply_matrices_IKJ()
 {
 	// mnozenie macierzy 
@@ -56,6 +67,19 @@ void multiply_matrices_IKJ()
 		matrix_r[i][j] += matrix_a[i][k] * matrix_b[k][j];
 
 }
+
+
+void multiply_matrices_IJK_IKJ_SEQ()
+{
+	for (int i = 0; i < ROWS; i += R)
+	for (int j = 0; j < COLUMNS; j += R)
+	for (int k = 0; k < COLUMNS; k += R)
+	for (int ii = i; ii < i + R; ii++)
+	for (int kk = k; kk < k + R; kk++)
+	for (int jj = j; jj < j + R; jj++)
+			matrix_r[ii][jj] += matrix_a[ii][kk] * matrix_b[kk][jj];
+}
+
 
 void multiply_matrices_IJK_IKJ()
 {
@@ -114,14 +138,16 @@ int main(int argc, char* argv[])
 	initialize_matrices();
 	printf("IKJ ");
 	start = (double)clock() / CLK_TCK;
-	multiply_matrices_IKJ();
+	//multiply_matrices_IKJ();
+	multiply_matrices_IKJ_SEQ()
 	print_elapsed_time();
 
 
 	initialize_matrices();
 	printf("IJK_IKJ ");
 	start = (double)clock() / CLK_TCK;
-	multiply_matrices_IJK_IKJ();
+	//multiply_matrices_IJK_IKJ();
+	multiply_matrices_IJK_IKJ_SEQ()
 	print_elapsed_time();
 
 	fclose(result_file);
