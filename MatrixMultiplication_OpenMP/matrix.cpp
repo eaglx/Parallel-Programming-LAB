@@ -133,16 +133,20 @@ int main(int argc, char* argv[])
 	else
 		NumThreads = 1;
 	
+	fprintf(result_file, "********************************************************\n");
+	fprintf(result_file, "N = %d, R = %d\n", R, ROWS);
 	fprintf(result_file, "Klasyczny algorytm mnozenia macierzy, liczba watkow %d \n", NumThreads);
 	printf("liczba watkow  = %d\n\n", NumThreads);
 
 	initialize_matrices();
-	printf("IKJ SEQ");
+	fprintf(result_file, "IKJ SEQ\n");
+	printf("IKJ SEQ ");
 	start = (double)clock() / CLK_TCK;
 	multiply_matrices_IKJ_SEQ()
 	print_elapsed_time();
 	
 	initialize_matrices();
+	fprintf(result_file, "IKJ\n");
 	printf("IKJ ");
 	start = (double)clock() / CLK_TCK;
 	multiply_matrices_IKJ();
@@ -150,13 +154,15 @@ int main(int argc, char* argv[])
 
 
 	initialize_matrices();
-	printf("IJK_IKJ SEQ");
+	fprintf(result_file, "IJK_IKJ SEQ\n");
+	printf("IJK_IKJ SEQ ");
 	start = (double)clock() / CLK_TCK;
 	multiply_matrices_IJK_IKJ_SEQ()
 	print_elapsed_time();
 	
 	initialize_matrices();
 	printf("IJK_IKJ ");
+	fprintf(result_file, "IJK_IKJ\n");
 	start = (double)clock() / CLK_TCK;
 	multiply_matrices_IJK_IKJ();
 	print_elapsed_time();
